@@ -1,3 +1,35 @@
+let solarEnergy = 0.5; // default fallback
+
+async function fetchSolarData() {
+  try {
+    const response = await fetch(
+      "https://services.swpc.noaa.gov/products/solar-wind/plasma-7-day.json"
+    );
+    const data = await response.json();
+
+    // Last row = latest measurement
+    const latest = data[data.length - 1];
+
+    const windSpeed = parseFloat(latest[2]); // km/s
+
+    // Normalize wind speed range (typically 250–800 km/s)
+    solarEnergy = THREE.MathUtils.clamp(
+      (windSpeed - 250) / (800 - 250),
+      0,
+      1
+    );
+
+    console.log("Solar wind speed:", windSpeed, "Normalized:", solarEnergy);
+
+  } catch (error) {
+    console.log("Solar data fetch failed, using fallback.");
+  }
+}
+
+// Fetch immediately and every 5 minutes
+fetchSolarData();
+setInterval(fetchSolarData, 300000);
+
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js';
 
 const scene = new THREE.Scene();
@@ -85,10 +117,11 @@ void main() {
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
 
-function animate(time) {
-  uniforms.u_time.value = time * 0.001;
-  renderer.render(scene, camera);
+function animate() {
   requestAnimationFrame(animate);
+  material.uniforms.u_time.value = performance.now() / 1000;
+  material.uniforms.u_energy.value = solarEnergy;
+  renderer.render(scene, camera);
 }
 
 animate();
