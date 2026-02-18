@@ -44,17 +44,17 @@ float noise(vec2 p){
 
 vec3 solarPalette(float t) {
 
-  // expanded solar spectrum
-  vec3 deep   = vec3(0.18, 0.05, 0.07);  // rose shadow
-  vec3 ember  = vec3(0.85, 0.35, 0.12);  // coral core
-  vec3 gold   = vec3(1.0, 0.75, 0.3);    // golden flare
-  vec3 bloom  = vec3(0.95, 0.65, 0.75);  // soft mauve glow
-  vec3 flare  = vec3(1.0, 0.92, 0.75);   // solar white
+  // grounded warm solar spectrum
+  vec3 deep   = vec3(0.16, 0.05, 0.06);   // warm rose shadow
+  vec3 ember  = vec3(0.85, 0.38, 0.15);   // coral core
+  vec3 gold   = vec3(1.0, 0.72, 0.28);    // radiant gold
+  vec3 peach  = vec3(1.0, 0.78, 0.55);    // warm bloom (not pink)
+  vec3 flare  = vec3(1.0, 0.95, 0.82);    // incandescent light
 
   vec3 col = mix(deep, ember, smoothstep(0.0, 0.3, t));
-  col = mix(col, gold, smoothstep(0.2, 0.6, t));
-  col = mix(col, bloom, smoothstep(0.5, 0.85, t));
-  col = mix(col, flare, smoothstep(0.75, 1.0, t));
+  col = mix(col, gold, smoothstep(0.25, 0.6, t));
+  col = mix(col, peach, smoothstep(0.55, 0.85, t));
+  col = mix(col, flare, smoothstep(0.8, 1.0, t));
 
   return col;
 }
@@ -75,7 +75,7 @@ void main() {
   float drift = sin(u_time * 0.02) * 0.5 + 0.5;
   float micro = sin(u_time * 0.07) * 0.03;
 
-  vec3 color = solarPalette(energyInfluence + drift * 0.35 + micro);
+  vec3 color = solarPalette(energyInfluence + drift * 0.28 + micro);
 
   gl_FragColor = vec4(color, 1.0);
 }
