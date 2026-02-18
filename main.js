@@ -19,48 +19,62 @@ const material = new THREE.ShaderMaterial({
   uniforms,
   fragmentShader: `
     uniform float u_time;
-    uniform float u_energy;
-    uniform vec2 u_resolution;
+uniform float u_energy;
+uniform vec2 u_resolution;
 
-    float hash(vec2 p) {
-      return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-    }
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+}
 
-    float noise(vec2 p){
-      vec2 i = floor(p);
-      vec2 f = fract(p);
+float noise(vec2 p){
+  vec2 i = floor(p);
+  vec2 f = fract(p);
 
-      float a = hash(i);
-      float b = hash(i + vec2(1.0, 0.0));
-      float c = hash(i + vec2(0.0, 1.0));
-      float d = hash(i + vec2(1.0, 1.0));
+  float a = hash(i);
+  float b = hash(i + vec2(1.0, 0.0));
+  float c = hash(i + vec2(0.0, 1.0));
+  float d = hash(i + vec2(1.0, 1.0));
 
-      vec2 u = f * f * (3.0 - 2.0 * f);
+  vec2 u = f * f * (3.0 - 2.0 * f);
 
-      return mix(a, b, u.x) +
-             (c - a) * u.y * (1.0 - u.x) +
-             (d - b) * u.x * u.y;
-    }
+  return mix(a, b, u.x) +
+         (c - a) * u.y * (1.0 - u.x) +
+         (d - b) * u.x * u.y;
+}
 
-    void main() {
-      vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-      uv -= 0.5;
-      uv.x *= u_resolution.x / u_resolution.y;
+vec3 solarPalette(float t) {
+  // warm solar core
+  vec3 deep = vec3(0.15, 0.05, 0.02);
+  vec3 ember = vec3(0.8, 0.3, 0.05);
+  vec3 gold = vec3(1.0, 0.7, 0.2);
+  vec3 flare = vec3(1.0, 0.9, 0.6);
 
-      float t = u_time * 0.05;
+  vec3 col = mix(deep, ember, smoothstep(0.0, 0.4, t));
+  col = mix(col, gold, smoothstep(0.3, 0.7, t));
+  col = mix(col, flare, smoothstep(0.6, 1.0, t));
 
-      float n = noise(uv * 3.0 + t);
+  return col;
+}
 
-      float energyWave = sin(u_time * 0.1) * 0.5 + 0.5;
-      float intensity = mix(n, energyWave, u_energy);
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+  uv -= 0.5;
+  uv.x *= u_resolution.x / u_resolution.y;
 
-      vec3 baseColor = vec3(0.05, 0.1, 0.2);
-      vec3 glowColor = vec3(0.6, 0.3, 0.8);
+  float t = u_time * 0.03;
 
-      vec3 color = mix(baseColor, glowColor, intensity);
+  float n = noise(uv * 2.5 + t);
+  float breath = sin(u_time * 0.1) * 0.5 + 0.5;
 
-      gl_FragColor = vec4(color, 1.0);
-    }
+  float energyInfluence = mix(n, breath, u_energy);
+
+  // slow hue drift for subtle color shifting
+  float drift = sin(u_time * 0.02) * 0.5 + 0.5;
+
+  vec3 color = solarPalette(energyInfluence + drift * 0.2);
+
+  gl_FragColor = vec4(color, 1.0);
+}
   `
 });
 
