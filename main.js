@@ -74,7 +74,7 @@ void main() {
   // slow hue drift for subtle color shifting
   float drift = sin(u_time * 0.02) * 0.5 + 0.5;
 
-  vec3 color = solarPalette(energyInfluence + drift * 0.2);
+  vec3 color = solarPalette(energyInfluence + drift * 0.35);
 
   gl_FragColor = vec4(color, 1.0);
 }
