@@ -43,15 +43,18 @@ float noise(vec2 p){
 }
 
 vec3 solarPalette(float t) {
-  // warm solar core
-  vec3 deep = vec3(0.15, 0.05, 0.02);
-  vec3 ember = vec3(0.8, 0.3, 0.05);
-  vec3 gold = vec3(1.0, 0.7, 0.2);
-  vec3 flare = vec3(1.0, 0.9, 0.6);
 
-  vec3 col = mix(deep, ember, smoothstep(0.0, 0.4, t));
-  col = mix(col, gold, smoothstep(0.3, 0.7, t));
-  col = mix(col, flare, smoothstep(0.6, 1.0, t));
+  // expanded solar spectrum
+  vec3 deep   = vec3(0.18, 0.05, 0.07);  // rose shadow
+  vec3 ember  = vec3(0.85, 0.35, 0.12);  // coral core
+  vec3 gold   = vec3(1.0, 0.75, 0.3);    // golden flare
+  vec3 bloom  = vec3(0.95, 0.65, 0.75);  // soft mauve glow
+  vec3 flare  = vec3(1.0, 0.92, 0.75);   // solar white
+
+  vec3 col = mix(deep, ember, smoothstep(0.0, 0.3, t));
+  col = mix(col, gold, smoothstep(0.2, 0.6, t));
+  col = mix(col, bloom, smoothstep(0.5, 0.85, t));
+  col = mix(col, flare, smoothstep(0.75, 1.0, t));
 
   return col;
 }
