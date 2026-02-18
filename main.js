@@ -5,24 +5,14 @@ async function fetchSolarData() {
     const response = await fetch(
       "https://services.swpc.noaa.gov/products/solar-wind/plasma-7-day.json"
     );
+
+    console.log("Response status:", response.status);
+
     const data = await response.json();
-
-    // Last row = latest measurement
-    const latest = data[data.length - 1];
-
-    const windSpeed = parseFloat(latest[2]); // km/s
-
-    // Normalize wind speed range (typically 250–800 km/s)
-    solarEnergy = THREE.MathUtils.clamp(
-      (windSpeed - 250) / (800 - 250),
-      0,
-      1
-    );
-
-    console.log("Solar wind speed:", windSpeed, "Normalized:", solarEnergy);
+    console.log("Raw solar data:", data);
 
   } catch (error) {
-    console.log("Solar data fetch failed, using fallback.");
+    console.error("Actual fetch error:", error);
   }
 }
 
