@@ -95,6 +95,9 @@ void main() {
   vec2 uv = gl_FragCoord.xy / u_resolution.xy;
   uv -= 0.5;
   uv.x *= u_resolution.x / u_resolution.y;
+  
+  float dist = length(uv);
+  float core = smoothstep(0.8, 0.0, dist);
 
   float t = u_time * 0.03;
 
@@ -103,11 +106,16 @@ void main() {
 
   float energyInfluence = mix(n, breath, u_energy);
 
+  // Slight density increase toward center
+  energyInfluence += core * 0.15;
+
   // slow hue drift for subtle color shifting
   float drift = sin(u_time * 0.02) * 0.5 + 0.5;
   float micro = sin(u_time * 0.07) * 0.03;
 
   vec3 color = solarPalette(energyInfluence + drift * 0.28 + micro);
+  // Soft atmospheric fade toward edges
+  color *= 0.9 + core * 0.1;
 
   gl_FragColor = vec4(color, 1.0);
 }
